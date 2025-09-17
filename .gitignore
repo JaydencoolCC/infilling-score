@@ -100,5 +100,4 @@ dmypy.json
 results/
 *.csv
 *.log
-models/
 checkpoints/
