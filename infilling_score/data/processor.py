@@ -4,7 +4,7 @@ Data processing utilities for WikiMIA datasets.
 
 import re
 from typing import List, Dict, Any
-from datasets import load_dataset
+from datasets import load_dataset, load_from_disk
 
 
 class DataProcessor:
@@ -43,6 +43,50 @@ class DataProcessor:
         data = DataProcessor.convert_huggingface_data_to_list_dic(dataset)
         
         print(f"Loaded {len(data)} samples from WikiMIA")
+        return data
+    
+    def load_reasoning_data(dataset_name: str) -> List[Dict[str, Any]]:
+        """Load and preprocess custom reasoning dataset."""
+        print(f"Loading reasoning dataset from: {dataset_name}")
+        data_config = {
+            "s1K_split": "/mnt/sharedata/hdd/users/zhanghx/ssd2/zhanghx/dataset/s1K_tokenized",
+            "s1.1K_split": "/mnt/sharedata/hdd/users/zhanghx/ssd2/zhanghx/dataset/s1K-1.1_tokenized",
+            "limo_split": "/mnt/sharedata/hdd/users/zhanghx/ssd2/zhanghx/dataset/LIMO_tokenized",
+        }
+        dataset = load_from_disk(data_config[dataset_name])
+        
+        if dataset_name in ["s1K_split", "s1.1K_split"]:
+            dataset = dataset['train']
+        
+        train_test_split = dataset.train_test_split(train_size=0.8, seed=42, shuffle=True)
+        train_dataset = train_test_split['train']
+        test_dataset =  train_test_split['test']
+        print(f"train dataset: {len(train_dataset)} test_dataset: {len(test_dataset)}")
+        member = train_dataset
+        non_member = test_dataset
+        sample_num = len(non_member)
+        # choose first sample_num from member
+        # member = member.select(range(sample_num))
+        
+        data_dic_list = []
+        for i in range(sample_num):
+            member_ex = member[i]
+            # non_member_ex = non_member[i]
+            data_dic_list.append({
+                "input": member_ex['question'],
+                "label": 1
+            })
+        for i in range(sample_num):
+            non_member_ex = non_member[i]
+            data_dic_list.append({
+                "input": non_member_ex['question'],
+                "label": 0
+            })
+        # Convert to list of dictionaries
+        # data = DataProcessor.convert_huggingface_data_to_list_dic(dataset)
+        
+        data = data_dic_list
+        print(f"Loaded {len(data)} samples from reasoning dataset")
         return data
     
     @staticmethod

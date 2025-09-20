@@ -20,7 +20,7 @@ from infilling_score.models.detector import InfillingScoreDetector
 from infilling_score.data.processor import DataProcessor  
 from infilling_score.metrics.calculator import MetricsCalculator
 from infilling_score.optimizations.infill import OptimizedInfillCalculator
-from infilling_score.utils.constants import WIKIMIA_DATASETS, DEFAULT_CONFIG
+from infilling_score.utils.constants import WIKIMIA_DATASETS, DEFAULT_CONFIG, model_path_dict
 
 
 def parse_arguments():
@@ -31,7 +31,6 @@ def parse_arguments():
     parser.add_argument('--model', type=str, default=DEFAULT_CONFIG['model'],
                        help='Model name or path')
     parser.add_argument('--dataset', type=str, default=DEFAULT_CONFIG['dataset'],
-                       choices=WIKIMIA_DATASETS,
                        help='WikiMIA dataset to use')
     
     # Performance options
@@ -54,7 +53,7 @@ def parse_arguments():
     parser.add_argument('--output_dir', type=str, default=DEFAULT_CONFIG['output_dir'],
                        help='Output directory for results')
     parser.add_argument('--benchmark', action='store_true',
-                       help='Run benchmark comparing optimized vs original infill')
+                       help='Run benchmark comparing optimized vs original icnfill')
     parser.add_argument('--verbose', action='store_true',
                        help='Enable verbose output')
     parser.add_argument('--analyze_scores', action='store_true',
@@ -153,6 +152,9 @@ def display_top_methods(results: pd.DataFrame, top_k: int = 5) -> None:
     df_sorted['auroc_numeric'] = df_sorted['auroc'].str.rstrip('%').astype(float)
     top_methods = df_sorted.nlargest(top_k, 'auroc_numeric')[['method', 'auroc', 'fpr95', 'tpr05']]
     print(top_methods.to_string(index=False))
+    
+    return top_methods
+    
 
 
 def main():
@@ -165,6 +167,10 @@ def main():
     print(f"Dataset: {args.dataset}")
     print(f"Batch size: {args.batch_size}")
     
+    
+    # get_model_path
+    args.model = model_path_dict[args.model]
+    
     # Initialize detector
     use_optimized = not args.disable_optimized_infill
     detector = InfillingScoreDetector(
@@ -173,11 +179,17 @@ def main():
     )
     
     # Load WikiMIA data
-    print(f"\nLoading WikiMIA dataset: {args.dataset}")
-    data = DataProcessor.load_wikimia_data(args.dataset)
-    
+    # print(f"\nLoading WikiMIA dataset: {args.dataset}")
+    # data = DataProcessor.load_wikimia_data(args.dataset)
     # Print dataset statistics
+    # DataProcessor.print_dataset_statistics(data)
+    
+    # load reasoning data
+    # print(f"\nLoading reasoning dataset: {args.dataset}")
+    data = DataProcessor.load_reasoning_data(args.dataset)
+    # data = data[:5]
     DataProcessor.print_dataset_statistics(data)
+    # import pdb; pdb.set_trace()
     
     # Run benchmark if requested
     if args.benchmark and len(data) > 0:
@@ -200,6 +212,7 @@ def main():
         
         for method, score in scores.items():
             all_scores[method].append(score)
+            
     
     # Analyze score distributions if requested
     if args.analyze_scores:
@@ -211,12 +224,14 @@ def main():
     results = defaultdict(list)
     
     for method, scores in all_scores.items():
-        auroc, fpr95, tpr05 = MetricsCalculator.calculate_metrics(scores, labels, args.verbose)
+        auroc, fpr95, tpr05, tpr01= MetricsCalculator.calculate_metrics(scores, labels, args.verbose)
         
         results['method'].append(method)
         results['auroc'].append(f"{auroc:.1%}")
         results['fpr95'].append(f"{fpr95:.1%}")
         results['tpr05'].append(f"{tpr05:.1%}")
+        results['tpr01'].append(f"{tpr01:.1%}")
+        
     
     # Create results dataframe
     df = pd.DataFrame(results)
@@ -227,15 +242,29 @@ def main():
     print(df.to_string(index=False))
     
     # Display top methods
-    display_top_methods(df)
+    top_methods = display_top_methods(df)
+        # Save results
+    df = pd.concat([df, top_methods], ignore_index=True)
     
-    # Save results
+    # get best results for filling
+    infill_methods = df[df['method'].str.contains('infill')]
+    # 找到 auroc 最大的条目
+    infill_methods['auroc_numeric'] = infill_methods['auroc'].str.rstrip('%').astype(float)  # 将 auroc 转换为数值
+    max_infill_row = infill_methods.loc[infill_methods['auroc_numeric'].idxmax()]  # 找到 auroc 最大的行
+
+    # 将最大值条目添加到 df 中
+    max_infill_row = max_infill_row.to_frame().T  # 转换为 DataFrame
+    max_infill_row['is_max_infill'] = True  # 添加标记列
+    df['is_max_infill'] = False  # 为原始数据添加标记列
+    df = pd.concat([df, max_infill_row], ignore_index=True)  # 合并到 df 中
+    # 删除临时列
+    df.drop(columns=['auroc_numeric'], inplace=True)
+
+    
     model_id = args.model.split('/')[-1]
     dataset_id = args.dataset
     output_file = save_results(df, args, model_id, dataset_id)
     print(f"\nResults saved to: {output_file}")
-
-
 if __name__ == "__main__":
     main()
 

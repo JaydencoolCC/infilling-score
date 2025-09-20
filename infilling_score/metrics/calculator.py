@@ -21,7 +21,7 @@ class MetricsCalculator:
             verbose: Whether to print debugging information
             
         Returns:
-            Tuple of (auroc, fpr95, tpr05)
+            Tuple of (auroc, fpr95, tpr05, tpr01)
         """
         # Convert to numpy arrays for easier handling
         scores_array = np.array(scores, dtype=np.float64)
@@ -54,14 +54,14 @@ class MetricsCalculator:
         if len(scores_array) < 2:
             if verbose:
                 print("Warning: Not enough valid scores for metrics calculation")
-            return 0.0, 1.0, 0.0
+            return 0.0, 1.0, 0.0, 0.0
         
         # Check if we have both classes after filtering
         unique_labels = np.unique(labels_array)
         if len(unique_labels) < 2:
             if verbose:
                 print("Warning: Only one class present in labels after filtering")
-            return 0.0, 1.0, 0.0
+            return 0.0, 1.0, 0.0, 0.0
         
         # Final check: ensure no extreme values that could cause issues
         # Replace any remaining extreme values with clipped versions
@@ -79,14 +79,17 @@ class MetricsCalculator:
             tpr05_idx = np.where(fpr_list <= 0.05)[0]
             tpr05 = tpr_list[tpr05_idx[-1]] if len(tpr05_idx) > 0 else 0.0
             
-            return auroc, fpr95, tpr05
+            # TPR when FPR <= 1%
+            tpr01_idx = np.where(fpr_list <= 0.01)[0]
+            tpr01 = tpr_list[tpr01_idx[-1]] if len(tpr01_idx) > 0 else 0.0
+            return auroc, fpr95, tpr05, tpr01
             
         except Exception as e:
             if verbose:
                 print(f"Error in ROC calculation: {e}")
                 print(f"Scores range: [{np.min(scores_array):.3f}, {np.max(scores_array):.3f}]")
                 print(f"Labels: {np.unique(labels_array, return_counts=True)}")
-            return 0.0, 1.0, 0.0
+            return 0.0, 1.0, 0.0, 0.0
     
     @staticmethod
     def analyze_score_distribution(scores: List[float], method_name: str = "") -> None:
