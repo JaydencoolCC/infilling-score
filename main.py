@@ -169,6 +169,7 @@ def main():
     
     
     # get_model_path
+    model_id = args.model
     args.model = model_path_dict[args.model]
     
     # Initialize detector
@@ -187,7 +188,7 @@ def main():
     # load reasoning data
     # print(f"\nLoading reasoning dataset: {args.dataset}")
     data = DataProcessor.load_reasoning_data(args.dataset)
-    # data = data[:5]
+    # data = data[:10]
     DataProcessor.print_dataset_statistics(data)
     # import pdb; pdb.set_trace()
     
@@ -213,7 +214,6 @@ def main():
         for method, score in scores.items():
             all_scores[method].append(score)
             
-    
     # Analyze score distributions if requested
     if args.analyze_scores:
         analyze_score_distributions(all_scores, args.verbose)
@@ -231,8 +231,9 @@ def main():
         results['fpr95'].append(f"{fpr95:.1%}")
         results['tpr05'].append(f"{tpr05:.1%}")
         results['tpr01'].append(f"{tpr01:.1%}")
+        results['scores'].append(scores)
+        results['labels'].append(labels)
         
-    
     # Create results dataframe
     df = pd.DataFrame(results)
     
@@ -261,7 +262,7 @@ def main():
     df.drop(columns=['auroc_numeric'], inplace=True)
 
     
-    model_id = args.model.split('/')[-1]
+    model_id = model_id.split('/')[-1]
     dataset_id = args.dataset
     output_file = save_results(df, args, model_id, dataset_id)
     print(f"\nResults saved to: {output_file}")

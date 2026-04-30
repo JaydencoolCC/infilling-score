@@ -52,6 +52,7 @@ class DataProcessor:
             "s1K_split": "/mnt/sharedata/hdd/users/zhanghx/ssd2/zhanghx/dataset/s1K_tokenized",
             "s1.1K_split": "/mnt/sharedata/hdd/users/zhanghx/ssd2/zhanghx/dataset/s1K-1.1_tokenized",
             "limo_split": "/mnt/sharedata/hdd/users/zhanghx/ssd2/zhanghx/dataset/LIMO_tokenized",
+            "s1K_paraphrased": "/mnt/sharedata/hdd/users/zhanghx/ssd2/zhanghx/dataset/s1K_tokenized_paraphrased"
         }
         dataset = load_from_disk(data_config[dataset_name])
         

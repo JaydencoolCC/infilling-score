@@ -8,16 +8,29 @@ RATIO_THRESHOLDS = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
 # model_path_config
 model_path_dict = {
-    "s1-32B-0.8": "/mnt/sharedata/ssd_large/users/zhanghx/models/reasoner/32B/s1K-32B-0.8/model",
+    "s1-32B-0.8": "/mnt/sharedata/hdd/users/zhanghx/ssd_large/users/zhanghx/models/reasoner/32B/s1K-32B-0.8/model",
     "s1-32B-0.6": "/mnt/sharedata/ssd_large/users/zhanghx/models/reasoner/32B/s1K-32B-0.6/model",
     "s1.1-32B-0.8": "/mnt/sharedata/ssd_large/users/zhanghx/models/reasoner/32B/s1.1K-32B-0.8/model",
     "limo-32B-0.8": "/mnt/sharedata/ssd_large/users/zhanghx/models/reasoner/32B/limo-32B-0.8/model",
-    "s1-14B-0.8": "/mnt/sharedata/ssd_large/users/zhanghx/models/reasoner/different-sized/Qwen2.5-14B-Instruct/s1K/model",
-    "s1-7B-0.8": "/mnt/sharedata/ssd_large/users/zhanghx/models/reasoner/different-sized/Qwen2.5-7B-Instruct/s1K/model",
+    "s1-14B-0.8": "/mnt/sharedata/hdd/users/zhanghx/ssd_large/users/zhanghx/models/reasoner/different-sized/Qwen2.5-14B-Instruct/s1K/model",
+    "s1-7B-0.8": "/mnt/sharedata/hdd/users/zhanghx/ssd_large/users/zhanghx/models/reasoner/different-sized/Qwen2.5-7B-Instruct/s1K/model",
     "limo-14B-0.8":"/mnt/sharedata/hdd/zhanghx/reason/limo_14B",
     "s1.1-14B-0.8":"/mnt/sharedata/hdd/zhanghx/reason/s1.1k_14B",
     "limo-7B-0.8": "/mnt/sharedata/hdd/zhanghx/reason/7B_new/limo_7B",
     "s1.1-7B-0.8": "/mnt/sharedata/hdd/zhanghx/reason/7B_new/s1.1k_7B",
+    "s1-gemma-0.8" : "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/s1_gemma/model",
+    "s1-llama-0.8": "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/s1_llama/model",
+    # "s1_Phi-0.8": "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/s1_Phi/model",
+    "s1_Phi-0.8": "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/s1_Phi/new",
+    "s1_Phi3-0.8": "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/s1_Phi3/model",
+    "s1-qwen7b-epoch3": "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/Qwen2.5-7B-Instruct/epoch_3",
+    "s1-qwen7b-epoch4": "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/Qwen2.5-7B-Instruct/epoch_4",
+    "s1-qwen7b-lr3": "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/Qwen2.5-7B-Instruct/lr_3/model",
+    "s1-qwen7b-lr4": "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/Qwen2.5-7B-Instruct/lr_4",
+    # "s1-qwen7b-lr6": "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/Qwen2.5-7B-Instruct/lr_6",
+    "s1-qwen7b-lr6": "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/Qwen2.5-7B-Instruct/learn6/model",
+    "s1-mistral-0.8": "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/s1-mistral/model",
+    "s1-lora-7B": "/mnt/sharedata/ssd_large/users/zhanghx/2026iclr/models/s1-qwen-lora/merged"
     }
 
 
